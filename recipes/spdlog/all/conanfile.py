@@ -28,12 +28,17 @@ class SpdlogConan(ConanFile):
         "no_exceptions": [True, False],
     }
     default_options = {
-        "shared": False,
-        "fPIC": True,
+        "shared": True,
+        "fPIC": False,
         "header_only": False,
         "wchar_support": False,
         "wchar_filenames": False,
+<<<<<<< Updated upstream
         "no_exceptions": False,
+=======
+        "no_exceptions": True,
+        "use_std_fmt": False,
+>>>>>>> Stashed changes
     }
 
     def export_sources(self):

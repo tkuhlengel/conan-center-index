@@ -28,9 +28,9 @@ class GlogConan(ConanFile):
     default_options = {
         "shared": False,
         "fPIC": True,
-        "with_gflags": True,
+        "with_gflags": False,
         "with_threads": True,
-        "with_unwind": True,
+        "with_unwind": False,
     }
 
     def export_sources(self):

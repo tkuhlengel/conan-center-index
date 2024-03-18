@@ -30,10 +30,10 @@ class ProtobufConan(ConanFile):
         "debug_suffix": [True, False],
     }
     default_options = {
-        "shared": False,
-        "fPIC": True,
+        "shared": True,
+        "fPIC": False,
         "with_zlib": True,
-        "with_rtti": True,
+        "with_rtti": False,
         "lite": False,
         "debug_suffix": True,
     }
@@ -70,7 +70,7 @@ class ProtobufConan(ConanFile):
 
     def requirements(self):
         if self.options.with_zlib:
-            self.requires("zlib/[>=1.2.11 <2]")
+            self.requires("zlib/[>=1.2.11 <1.4]")
 
     def validate(self):
         if self.options.shared and is_msvc_static_runtime(self):

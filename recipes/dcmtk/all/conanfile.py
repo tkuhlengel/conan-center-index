@@ -46,11 +46,11 @@ class DCMTKConan(ConanFile):
         "with_applications": False,
         "with_multithreading": True,
         "charset_conversion": "libiconv",
-        "with_libxml2": True,
+        "with_libxml2": False,
         "with_zlib": True,
         "with_openssl": True,
         "with_libpng": True,
-        "with_libtiff": True,
+        "with_libtiff": False,
         "with_tcpwrappers": False,
         "default_dict": "external",
         "builtin_dictionary": "deprecated",
@@ -92,7 +92,7 @@ class DCMTKConan(ConanFile):
 
     def requirements(self):
         if self.options.charset_conversion == "libiconv":
-            self.requires("libiconv/1.17")
+            self.requires("libiconv/[>=1.16]")
         elif self.options.charset_conversion == "icu":
             self.requires("icu/73.2")
         if self.options.with_libxml2:

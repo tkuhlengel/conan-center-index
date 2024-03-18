@@ -69,6 +69,7 @@ class QtConan(ConanFile):
 
         "gui": [True, False],
         "widgets": [True, False],
+#        "qtwayland": [True, False],
 
         "android_sdk": [None, "ANY"],
         "device": [None, "ANY"],
@@ -80,12 +81,12 @@ class QtConan(ConanFile):
     options.update({module: [True, False] for module in _submodules})
 
     default_options = {
-        "shared": False,
+        "shared": True,
         "commercial": False,
         "opengl": "desktop",
         "with_vulkan": False,
         "openssl": True,
-        "with_pcre2": True,
+        "with_pcre2": False,
         "with_glib": False,
         # "with_libiconv": True, # QTBUG-84708
         "with_doubleconversion": True,
@@ -95,12 +96,12 @@ class QtConan(ConanFile):
         "with_harfbuzz": False,
         "with_libjpeg": "libjpeg",
         "with_libpng": True,
-        "with_sqlite3": True,
-        "with_mysql": True,
-        "with_pq": True,
-        "with_odbc": True,
+        "with_sqlite3": False,
+        "with_mysql": False,
+        "with_pq": False,
+        "with_odbc": False,
         "with_libalsa": False,
-        "with_openal": True,
+        "with_openal": False,
         "with_zstd": True,
         "with_gstreamer": False,
         "with_pulseaudio": False,
@@ -112,6 +113,7 @@ class QtConan(ConanFile):
 
         "gui": True,
         "widgets": True,
+        #"qtwayland": False,
 
         "android_sdk": None,
         "device": None,
@@ -341,7 +343,7 @@ class QtConan(ConanFile):
     def requirements(self):
         self.requires("zlib/[>=1.2.11 <2]")
         if self.options.openssl:
-            self.requires("openssl/[>=1.1 <4]")
+            self.requires("openssl/[>=1.1 <2]")
         if self.options.with_pcre2:
             self.requires("pcre2/10.42")
         if self.options.get_safe("with_vulkan"):
@@ -357,7 +359,11 @@ class QtConan(ConanFile):
         if self.options.get_safe("with_freetype", False) and not self.options.multiconfiguration:
             self.requires("freetype/2.13.0")
         if self.options.get_safe("with_fontconfig", False):
+<<<<<<< Updated upstream
             self.requires("fontconfig/2.14.2")
+=======
+            self.requires("fontconfig/2.13.92")
+>>>>>>> Stashed changes
         if self.options.get_safe("with_icu", False):
             self.requires("icu/73.2")
         if self.options.get_safe("with_harfbuzz", False) and not self.options.multiconfiguration:
@@ -368,7 +374,11 @@ class QtConan(ConanFile):
             else:
                 self.requires("libjpeg/9e")
         if self.options.get_safe("with_libpng", False) and not self.options.multiconfiguration:
+<<<<<<< Updated upstream
             self.requires("libpng/1.6.40")
+=======
+            self.requires("libpng/1.6.43")
+>>>>>>> Stashed changes
         if self.options.with_sqlite3 and not self.options.multiconfiguration:
             self.requires("sqlite3/3.43.1")
         if self.options.get_safe("with_mysql", False):

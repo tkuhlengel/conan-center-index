@@ -39,12 +39,12 @@ class DlibConan(ConanFile):
         "with_gif": True,
         "with_jpeg": True,
         "with_png": True,
-        "with_webp": True,
-        "with_sqlite3": True,
+        "with_webp": False,
+        "with_sqlite3": False,
         "with_sse2": "auto",
         "with_sse4": "auto",
         "with_avx": "auto",
-        "with_openblas": True,
+        "with_openblas": False,
     }
 
     @property
@@ -74,13 +74,17 @@ class DlibConan(ConanFile):
         if self.options.with_jpeg:
             self.requires("libjpeg/9e")
         if self.options.with_png:
-            self.requires("libpng/1.6.40")
+            self.requires("libpng/[~1.6]")
         if self.options.get_safe("with_webp"):
             self.requires("libwebp/1.3.2")
         if self.options.with_sqlite3:
             self.requires("sqlite3/3.43.1")
         if self.options.with_openblas:
+<<<<<<< Updated upstream
             self.requires("openblas/0.3.20")
+=======
+            self.requires("openblas/[~0.3]")
+>>>>>>> Stashed changes
 
     def validate(self):
         if self.settings.get_safe("compiler.cppstd"):

@@ -31,13 +31,13 @@ class FreetypeConan(ConanFile):
         "subpixel": [True, False],
     }
     default_options = {
-        "shared": False,
+        "shared": True,
         "fPIC": True,
         "with_png": True,
         "with_zlib": True,
-        "with_bzip2": True,
-        "with_brotli": True,
-        "subpixel": False,
+        "with_bzip2": False,
+        "with_brotli": False,
+        "subpixel": True,
     }
 
     @property
@@ -66,7 +66,7 @@ class FreetypeConan(ConanFile):
         if self.options.with_png:
             self.requires("libpng/1.6.40")
         if self.options.with_zlib:
-            self.requires("zlib/[>=1.2.10 <2]")
+            self.requires("zlib/1.3.1")
         if self.options.with_bzip2:
             self.requires("bzip2/1.0.8")
         if self.options.get_safe("with_brotli"):

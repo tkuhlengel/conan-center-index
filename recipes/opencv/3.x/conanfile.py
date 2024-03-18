@@ -32,21 +32,27 @@ class OpenCVConan(ConanFile):
         "with_eigen": [True, False],
         "with_webp": [True, False],
         "with_gtk": [True, False],
+        "with_cuda": [True, False],
+        "with_protobuf": [True, False],
+        "build_cuda_stubs": [True, False],
         "nonfree": [True, False],
     }
     default_options = {
-        "shared": False,
-        "fPIC": True,
-        "parallel": False,
+        "shared": True,
+        "fPIC": False,
+        "parallel": "openmp",
         "contrib": False,
         "with_jpeg": "libjpeg",
         "with_png": True,
-        "with_tiff": True,
-        "with_jasper": True,
-        "with_openexr": True,
+        "with_tiff": False,
+        "with_jasper": False,
+        "with_openexr": False,
         "with_eigen": True,
-        "with_webp": True,
-        "with_gtk": True,
+        "with_webp": False,
+        "with_gtk": False,
+        "with_cuda": False,
+        "with_protobuf": False,
+        "build_cuda_stubs": False,
         "nonfree": False,
     }
 
@@ -84,7 +90,7 @@ class OpenCVConan(ConanFile):
         elif self.options.with_jpeg == "mozjpeg":
             self.requires("mozjpeg/4.1.3")
         if self.options.with_png:
-            self.requires("libpng/1.6.40")
+            self.requires("libpng/1.6.43")
         if self.options.with_jasper:
             self.requires("jasper/4.0.0")
         if self.options.with_openexr:
@@ -93,25 +99,31 @@ class OpenCVConan(ConanFile):
         if self.options.with_tiff:
             self.requires("libtiff/4.6.0")
         if self.options.with_eigen:
-            self.requires("eigen/3.4.0")
+            self.requires("eigen/[~3.4]")
         if self.options.parallel == "tbb":
             # opencv 3.x doesn't support onetbb >= 2021
             self.requires("onetbb/2020.3.3")
         if self.options.with_webp:
             self.requires("libwebp/1.3.2")
         if self.options.contrib:
-            self.requires("freetype/2.13.0")
+            self.requires("freetype/[~2.13]")
             self.requires("harfbuzz/8.2.2")
             self.requires("gflags/2.2.2")
-            self.requires("glog/0.6.0")
+            self.requires("glog/0.7.0")
         if self.options.get_safe("with_gtk"):
             self.requires("gtk/system")
+        if self.options.get_safe("with_protobuf"):
+            self.requires("protobuf/>=3.21")
+        # if self.options.get_safe("with_cuda"):
+        #     self.requires("cuda/11.8")
 
     def validate(self):
         if self.options.shared and is_msvc(self) and is_msvc_static_runtime(self):
             raise ConanInvalidConfiguration("Visual Studio with static runtime is not supported for shared library.")
         if self.settings.compiler == "clang" and Version(self.settings.compiler.version) < "4":
             raise ConanInvalidConfiguration("Clang 3.x cannot build OpenCV 3.x due an internal bug.")
+        if self.options.with_cuda and  self.options.build_cuda_stubs:
+            raise ConanInvalidConfiguration("build_cuda_stubs option is not supported when with_cuda is enabled")
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version][0], strip_root=True)
@@ -180,13 +192,14 @@ class OpenCVConan(ConanFile):
         tc.variables["BUILD_opencv_python_bindings_g"] = False
         tc.variables["BUILD_opencv_python_tests"] = False
         tc.variables["BUILD_opencv_ts"] = False
-        tc.variables["WITH_CUFFT"] = False
-        tc.variables["WITH_CUBLAS"] = False
-        tc.variables["WITH_NVCUVID"] = False
+        tc.variables["BUILD_CUDA_STUBS"] = self.options.get_safe("build_cuda_stubs", False)
+        # tc.variables["WITH_CUDA"] = self.options.get_safe("with_cuda")
+        # tc.variables["WITH_CUFFT"] = self.options.get_safe("with_cuda")
+        # tc.variables["WITH_CUBLAS"] = self.options.get_safe("with_cuda")
+        # tc.variables["WITH_NVCUVID"] = self.options.get_safe("with_cuda")
         tc.variables["WITH_FFMPEG"] = False
         tc.variables["WITH_GSTREAMER"] = False
         tc.variables["WITH_OPENCL"] = False
-        tc.variables["WITH_CUDA"] = False
         tc.variables["WITH_1394"] = False
         tc.variables["WITH_ADE"] = False
         tc.variables["WITH_ARAVIS"] = False
@@ -251,8 +264,40 @@ class OpenCVConan(ConanFile):
             tc.variables["OPENCV_EXTRA_MODULES_PATH"] = os.path.join(self._contrib_folder, "modules").replace("\\", "/")
         if is_msvc(self):
             tc.variables["BUILD_WITH_STATIC_CRT"] = is_msvc_static_runtime(self)
+            # tc.variables["BUILD_CU"]
+        if self.options.with_cuda:
+            tc.variables["CUDA_ARCH_BIN"] = "6.1 7.5 8.6"
+            tc.variables["CUDA_ARCH_PTX"] = "6.1 7.5 8.6"
+            # tc.variables["CUDA_FAST_MATH"] = True
+            tc.variables["WITH_CUBLAS"] = True
+            tc.variables["WITH_CUFFT"] = True
+            tc.variables["WITH_NVCUVID"] = True
+            tc.variables["WITH_CUDA"] = True
+            # tc.variables["WITH_CUDNN"] = False
+            # tc.variables["WITH_CUDNN_AUTO_INSTALL"] = False
+            # tc.variables["WITH_CUDNN_STATIC"] = False
+            # tc.variables["WITH_CUDNN_DL"] = False
+            # tc.variables["WITH_CUDNN_OPS"] = False
+            # tc.variables["WITH_CUDNN_CONVOLUTIONS"] = False
+            # tc.variables["WITH_CUDNN_POOLING"] = False
+            # tc.variables["WITH_CUDNN_BATCHNORM"] = False
+            # tc.variables["WITH_CUDNN_ACTIVATIONS"] = False
+            # tc.variables["WITH_CUDNN_LSTM"] = False
+            # tc.variables["WITH_CUDNN_DNN"] = False
+            # tc.variables["WITH_CUDNN_GRU"] = False
+            # tc.variables["WITH_CUDNN_RNN"] = False
+            # tc.variables["WITH_CUDNN_CNN_INFER"] = False
+            # tc.variables["WITH_CUDNN_CNN_TRAIN"] = False
+            # tc.variables["WITH_CUDNN_CNN"] = False
+            # tc.variables["WITH_CUDNN_CNN_INFER"] = False
+            # tc.variables["WITH_CUDNN_CNN_TRAIN"] = False
+            # tc.variables["WITH_CUDNN_CNN"] = False
+            # tc.variables["WITH_CUDNN_CNN_INFER"] = False
+            # tc.variables["WITH_CUDNN_CNN_TRAIN"] = False
+            # tc.variables["WITH_CUDNN_CNN"] = False
         tc.variables["ENABLE_PIC"] = self.options.get_safe("fPIC", True)
         tc.variables["ENABLE_CCACHE"] = False
+
         tc.generate()
 
         CMakeDeps(self).generate()
@@ -348,8 +393,11 @@ class OpenCVConan(ConanFile):
             return ["eigen::eigen"] if self.options.with_eigen else []
 
         def parallel():
-            if self.options.parallel:
-                return ["onetbb::onetbb"] if self.options.parallel == "tbb" else ["openmp"]
+            if self.options.parallel is not False:
+                if self.options.parallel == "tbb":
+                    return ["onetbb::onetbb"]
+                elif self.options.parallel == "openmp":
+                    return ["openmp"]
             return []
 
         def xfeatures2d():
